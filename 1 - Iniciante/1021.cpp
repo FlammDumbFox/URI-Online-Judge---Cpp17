@@ -25,4 +25,5 @@ int main(){
         decAmount -= coins[i] * n;
     }
 
-}
+} 
+
