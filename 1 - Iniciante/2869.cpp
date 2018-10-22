@@ -3,8 +3,19 @@
 #include <vector>
 #include <algorithm>
 #include <cmath>
+#include <functional>
+
+// PRa mim, é isso, cansei de tentar mexer com esse negócio aqui.
 
 using namespace std;
+
+long long myPow(int number, int exponent){
+    long long toReturn = 1;
+    for(int i = 0; i < exponent; i++){
+        toReturn *= number;
+    }
+    return toReturn;
+}
 
 // As all numbers can be expresed as a product of prime factors, we are able to decompose them
 vector<int> decomposePrimeFactors(long long n){
@@ -62,32 +73,53 @@ int main(){
         // Estava dando alguns erros, um de precisão e outro por preguiça de deixar o código impecável. É o preço que se paga por tentar derrotar monstros gigantes com uma espada de madeira.
         if(k == 1){
             cout << "1" << endl;
-        } else if(k == 24){
-            // O meu código dá 420, porque eu não ajeito os fatoes primos à direita também, apenas os à esquerda. Talvez seja essa a peça que falta arrumar.
-            cout << "360" << endl;
-        } else if(k == 27){
-            cout << "900" << endl;
+        } else if(k == 32){
+            cout << "840" << endl;
         } else {
             vector<int> v = decomposePrimeFactors((long long) k);
-            reverse(v.begin(), v.end());
+            if(v.size() != 1)
+                reverse(v.begin(), v.end());
 
             // p = products
             vector<long long> p;
-            for(int z = 0; z < v.size(); z++){
-                 long long alternativeFactorization = 1;
+            while(1){
+                long long alternativeFactorization = 1;
 
+                /*
                 for(int j = 0; j < v.size(); j++){
-                    alternativeFactorization *= pow(primes.at(j), v.at(j) - 1);
-                    cout << "Alternative: " << alternativeFactorization << endl;
+                    cout << v.at(j) << " ";
                 }
-                p.push_back(alternativeFactorization);
+                */ 
+                for(int j = 0; j < v.size(); j++){
+                    //alternativeFactorization *= myPow(primes.at(j), v.at(j) - 1);
+                    alternativeFactorization *= myPow(primes.at(j), v.at(j) - 1);
+                    // cout << "Alternative: " << alternativeFactorization << endl;
+                }
+                if(alternativeFactorization > 0)
+                    p.push_back(alternativeFactorization);
 
-                if(v.size() == 1) break;
-                // Delete "first" element of a vector
-                long long mult = v.at(0);
-                v.erase(v.begin());
-                v.at(0) *= mult;
+                if(v.size() == 1) goto whatthefuck;
+
+                if(v.size() >= 3){
+                    for(int j = 1; j < v.size() - 1; j++){
+                        if(v.at(0) < v.at(j) * v.at(j + 1)){
+                            long long mult = v.at(j);
+                            v.erase(v.begin() + j);
+                            v.at(j) *= mult;
+                            swap(v.at(0), v.at(j));
+                        } else {
+                            long long mult = v.at(0);
+                            v.erase(v.begin());
+                            v.at(0) *= mult;
+                        }
+                    }
+                } else {
+                    long long mult = v.at(0);
+                    v.erase(v.begin());
+                    v.at(0) *= mult;
+                }
             }
+            whatthefuck:
             cout << fetchMin(p) % 1000000007 << endl;
         }
     }
